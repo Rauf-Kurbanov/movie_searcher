@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>776</width>
-    <height>643</height>
+    <width>793</width>
+    <height>547</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -209,13 +209,6 @@
    <item row="0" column="0">
     <layout class="QVBoxLayout" name="goLayout">
      <item>
-      <widget class="QPushButton" name="goButton">
-       <property name="text">
-        <string>Go</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="nameButton1">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
@@ -308,6 +301,20 @@
        </property>
        <property name="flat">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="goButton">
+       <property name="text">
+        <string>Go</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetButton">
+       <property name="text">
+        <string>Reset Changes</string>
        </property>
       </widget>
      </item>
