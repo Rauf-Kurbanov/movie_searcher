@@ -1,30 +1,17 @@
-from os.path import join as pathJoin
-import pandas as pd
 import numpy as np
-import pickle
 import scipy.spatial.distance as dist
-from sklearn.preprocessing import normalize
 from sklearn.neighbors import NearestNeighbors
 import itertools as itt
 
-dataRootPath = "../tag-genome"
-
 
 class Metrics:
-    def __init__(self):
-        MovieID_TagID_Relevance = pathJoin(dataRootPath, "tag_relevance.dat")
-        MovieID_Title_MoviePopularity = pathJoin(dataRootPath, "movies.dat")
-        TagID_Tag_TagPopularity = pathJoin(dataRootPath, "tags.dat")
+    def __init__(self, tag_relevance, movies, tags, genome):
 
-        self.tag_relevance = pd.read_csv(MovieID_TagID_Relevance, delimiter='\t', header=None,
-                                         names=['MovieID', 'TagID', 'Relevance'])
-        self.movies = pd.read_csv(MovieID_Title_MoviePopularity, delimiter='\t', header=None,
-                                  names=['MovieID', 'Title', 'MoviePopularity'])
-        self.tags = pd.read_csv(TagID_Tag_TagPopularity, delimiter='\t', header=None,
-                                names=['TagID', 'Tag', 'TagPopularity'])
+        self.tag_relevance = tag_relevance
+        self.movies = movies
+        self.tags = tags
 
-        with open(pathJoin(dataRootPath, 'pickled/genome.pickle'), 'rb') as f:
-            self.genome = np.array(pickle.load(f))
+        self.genome = genome
 
         n_tags = self.tags.shape[0]
 

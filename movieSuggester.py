@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import sys
 from PyQt4 import QtCore, QtGui, uic
-from functools import partial
+from suggester.suggester import Suggester
 
 designerQTFile = "gui/layoutGUI.ui"
 
@@ -24,20 +24,23 @@ class MovieSuggester(QtGui.QWidget):
         for b in getWidgetsWithPrefix(self.goLayout, "nameButton"):
             b.clicked.connect(self.itemClicked)
 
+        self.suggester = Suggester()
 
-
-
+        self.rec6 = self.suggester.getInitialRecs(6)
+        self.populateButtons(rec6)
 
         self.show()
 
     def runGo(self):
-        '''Does the Go thing (forms the new output on the left)'''
-        pass
+        """Does the Go thing (forms the new output on the left)"""
+        self.rec6 = self.suggester.getNext(self.selected_movie, self.tags, self.directions)
+        self.populateButtons(rec6)
 
     def itemClicked(self):
-        '''Whenever we click on a movie we load the description,
-           pic from IMDB and set the tags for the movie'''
+        """Whenever we click on a movie we load the description,
+           pic from IMDB and set the tags for the movie"""
         button = self.sender()
+        # self.
         button.setText("Clicked")
 
     def getSliderValues(self):
@@ -50,9 +53,14 @@ class MovieSuggester(QtGui.QWidget):
             s.setValue(v)
 
 
-if __name__ == "__main__":
+def main():
     app = QtGui.QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)
 
+    suggester = Suggester()
+
     window = MovieSuggester()
     sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    main()
