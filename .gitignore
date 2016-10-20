@@ -90,3 +90,7 @@ ENV/
 
 # Data
 *.dat
+*.pickle
+
+# Idea
+.idea/*

@@ -3,7 +3,7 @@ import sys
 from PyQt4 import QtCore, QtGui, uic
 from functools import partial
 
-designerQTFile = "layoutGUI.ui"
+designerQTFile = "gui/layoutGUI.ui"
 
 def getWidgetsWithPrefix(layout, name = ""):
     return   [b for i in range(layout.count())
