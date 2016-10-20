@@ -29,7 +29,15 @@ class Suggester:
         self.n_movies = n_movies
 
     def getInitialRecs(self):
-        return list(self.movies.Title.loc[1:self.n_movies])
+        return [self.getMovieByName("Fight Club (1999)"),
+                self.getMovieByName("Hobbit: The Desolation of Smaug, The (2013)"),
+                self.getMovieByName("Inception (2010)"),
+                self.getMovieByName("Thor: The Dark World (2013)"),
+                self.getMovieByName("Frozen (2013)"),
+                self.getMovieByName("12 Angry Men (1957)")]
+
+    def getMovieByName(self, name):
+        return self.movies[self.movies.Title == name].Title.iloc[0]
 
     def getNextRecs(self, selectedMovies, tags):
         """Gets the selected movie :: string and new tag values :: ([name], [currentVals])

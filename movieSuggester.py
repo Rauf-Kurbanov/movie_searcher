@@ -6,10 +6,12 @@ from internet.movies import imdb_descr_and_poster_from_title
 
 designerQTFile = "gui/layoutGUI.ui"
 
-def getWidgetsWithPrefix(layout, name = ""):
-    return   [b for i in range(layout.count())
-                for b in [layout.itemAt(i).widget()]
-                if name in b.objectName()]
+
+def getWidgetsWithPrefix(layout, name=""):
+    return [b for i in range(layout.count())
+            for b in [layout.itemAt(i).widget()]
+            if name in b.objectName()]
+
 
 class MovieSuggester(QtGui.QWidget):
     def __init__(self, suggester):
@@ -40,7 +42,10 @@ class MovieSuggester(QtGui.QWidget):
         self.populateButtons(self.rec6)
 
     def populateMovieDescr(self):
-        descr, pic = imdb_descr_and_poster_from_title(self.selected_movie.split('(')[0])
+        # Stupid naming in the dataset
+        descr, pic = imdb_descr_and_poster_from_title(
+            self.selected_movie.rsplit('(', 1)[0]
+                               .rsplit(',', 1)[0])
         self.movieSummary.setText(descr)
 
         image = QtGui.QImage()
@@ -89,7 +94,6 @@ class MovieSuggester(QtGui.QWidget):
             s.setText(v)
 
 
-
 def main():
     app = QtGui.QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)
@@ -98,6 +102,7 @@ def main():
 
     window = MovieSuggester(suggester)
     sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     main()
