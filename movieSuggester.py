@@ -2,6 +2,7 @@
 import sys
 from PyQt4 import QtCore, QtGui, uic
 from suggester.suggester import Suggester
+from internet.movies import imdb_descr_and_poster_from_title
 
 designerQTFile = "gui/layoutGUI.ui"
 
@@ -29,6 +30,7 @@ class MovieSuggester(QtGui.QWidget):
         self.rec6 = self.suggester.getInitialRecs()
         self.selected_movie = self.rec6[0]
         self.populateButtons(self.rec6)
+        self.populateMovieDescr()
 
         self.show()
 
@@ -37,12 +39,21 @@ class MovieSuggester(QtGui.QWidget):
         self.rec6 = self.suggester.getNextRecs(self.selected_movie, self.getTags())
         self.populateButtons(self.rec6)
 
+    def populateMovieDescr(self):
+        descr, pic = imdb_descr_and_poster_from_title(self.selected_movie.split('(')[0])
+        self.movieSummary.setText(descr)
+
+        image = QtGui.QImage()
+        image.loadFromData(pic)
+        self.moviePicture.setPixmap(QtGui.QPixmap(image))
+
     def itemClicked(self):
         """Whenever we click on a movie we load the description,
            pic from IMDB and set the tags for the movie"""
         button = self.sender()
         self.selected_movie = button.text()
         self.setTags(self.suggester.getTopTags(self.selected_movie))
+        self.populateMovieDescr()
 
     def getSliderValues(self):
         sliderVals = [x.value() for x in getWidgetsWithPrefix(self.tagValuesLayout)]
