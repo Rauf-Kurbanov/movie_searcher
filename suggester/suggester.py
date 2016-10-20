@@ -2,7 +2,7 @@ from os.path import join as pathJoin
 import pandas as pd
 import numpy as np
 import pickle
-import random
+import itertools as itt
 
 from suggester.metrics import Metrics
 
@@ -28,21 +28,40 @@ class Suggester:
         self.metrics = Metrics(self.tag_relevance, self.movies, self.tags, self.genome)
         self.n_movies = n_movies
 
-    def getInitialRecs(self):
-        return [self.getMovieByName("Fight Club (1999)"),
-                self.getMovieByName("Hobbit: The Desolation of Smaug, The (2013)"),
-                self.getMovieByName("Inception (2010)"),
-                self.getMovieByName("Thor: The Dark World (2013)"),
-                self.getMovieByName("Frozen (2013)"),
-                self.getMovieByName("12 Angry Men (1957)")]
+        # self.prev_tag_values = np.repeat(0.5, self.tags.shape[0])
+        self.prev_tag_values = list(itt.repeat(0.5, self.tags.shape[0]))
+        self.curr_movie = self._movieTitleToNum("Fight Club (1999)")
 
-    def getMovieByName(self, name):
+    def getInitialRecs(self):
+        return [self._getMovieByName("Fight Club (1999)"),
+                self._getMovieByName("Hobbit: The Desolation of Smaug, The (2013)"),
+                self._getMovieByName("Inception (2010)"),
+                self._getMovieByName("Thor: The Dark World (2013)"),
+                self._getMovieByName("Frozen (2013)"),
+                self._getMovieByName("12 Angry Men (1957)")]
+
+    def _getMovieByName(self, name):
         return self.movies[self.movies.Title == name].Title.iloc[0]
 
     def getNextRecs(self, selectedMovie, tags):
         """Gets the selected movie :: string and new tag values :: ([name], [currentVals])
            and returns a new movies list"""
-        return list(self.movies.Title.loc[12:12 + self.n_movies])
+        tagNames, tagValues = tags
+        directions = [1 if p < c else 0 if p == c else -1
+                      for (p, c) in zip(self.prev_tag_values, tagValues)]
+        tagAndDir = [td for td in enumerate(directions) if td[1] != 0]
+
+        def norm(mId):
+            return np.product([self.metrics.critiqueFit(selectedMovie, mId, tag, d)
+                               for tag, d in tagAndDir])
+
+        candidates = self.metrics.movie_neighbours(selectedMovie)
+        for tag, d in tagAndDir:
+            candidates = [c for c in candidates if self.metrics.critiqueDist(selectedMovie, c, tag, d) > 0]
+
+        candidates = sorted(candidates, key=norm)[:5]
+        self.curr_movie = selectedMovie
+        return list(self.movies.loc[candidates].Title)
 
     def _movieTitleToNum(self, movie_name):
         movies = self.movies
@@ -58,4 +77,7 @@ class Suggester:
             tagIds.append(np.argmax(results))
 
         tagNames = list(self.tags.loc[tagIds, ].Tag)
-        return tagNames, [self.genome[mId, tid] * 100 for tid in tagIds]
+        tagValues = [self.genome[mId, tid] * 100 for tid in tagIds]
+
+        self.prev_tag_values = tagValues
+        return tagNames, tagValues

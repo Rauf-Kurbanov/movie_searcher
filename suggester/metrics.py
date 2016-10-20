@@ -117,7 +117,10 @@ class Metrics:
         return max(0, self.rel(t, ir) - self.rel(t, ic) * d)
 
     def linearSat(self, ic, ir, t, d):
-        self.critiqueDist(ic, ir, t, d)
+        return self.critiqueDist(ic, ir, t, d)
 
     def diminishSat(self, ic, ir, t, d):
-        1 - np.exp(-5 * self.critiqueDist(ic, ir, t, d))
+        return 1 - np.exp(-5 * self.critiqueDist(ic, ir, t, d))
+
+    def critiqueFit(self, ic, ir, t, d):
+        return self.linearSat(ic, ir, t, d) * self.articleCosSimi(ic, ir)
