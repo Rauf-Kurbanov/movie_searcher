@@ -32,6 +32,7 @@ class MovieSuggester(QtGui.QWidget):
         self.rec6 = self.suggester.getInitialRecs()
         self.selected_movie = self.rec6[0]
         self.populateButtons(self.rec6)
+        self.setTags(self.suggester.getTopTags(self.selected_movie))
         self.populateMovieDescr()
 
         self.show()

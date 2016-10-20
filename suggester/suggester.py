@@ -44,12 +44,12 @@ class Suggester:
            and returns a new movies list"""
         return list(self.movies.Title.loc[12:12 + self.n_movies])
 
-    def movieTitleToNum(self, movie_name):
+    def _movieTitleToNum(self, movie_name):
         movies = self.movies
         return np.argmax(movies.index.values[movies.Title == movie_name])
 
     def getTopTags(self, movie_name):
-        mId = self.movieTitleToNum(movie_name)
+        mId = self._movieTitleToNum(movie_name)
         Ni = self.metrics.N(mId)
         tagIds = []
         for i in range(5):
