@@ -44,14 +44,6 @@ class Suggester:
            and returns a new movies list"""
         return list(self.movies.Title.loc[12:12 + self.n_movies])
 
-    # def getTopTags(self, movie_name):
-    #     """ Returns ([tagNames], [tagVals]) for a movieName passed in
-    #         tagVals are from 0 to 99"""
-    #
-    #     f = random.randint
-    #     return (["Yuu", "Hoo", "Woo", "Zhoo", "Cloo", "Choo"],
-    #             [f(0, 99), f(0, 99), f(0, 99), f(0, 99), f(0, 99), f(0, 99)])
-
     def movieTitleToNum(self, movie_name):
         movies = self.movies
         return np.argmax(movies.index.values[movies.Title == movie_name])
@@ -66,6 +58,4 @@ class Suggester:
             tagIds.append(np.argmax(results))
 
         tagNames = list(self.tags.loc[tagIds, ].Tag)
-        print(tagIds)
-        print(tagNames)
-        return tagNames, tagIds
+        return tagNames, [self.genome[mId, tid] * 100 for tid in tagIds]
