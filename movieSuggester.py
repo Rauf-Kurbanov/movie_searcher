@@ -11,7 +11,7 @@ def getWidgetsWithPrefix(layout, name = ""):
                 if name in b.objectName()]
 
 class MovieSuggester(QtGui.QWidget):
-    def __init__(self):
+    def __init__(self, suggester):
         super(MovieSuggester, self).__init__()
         # Loads the xml and adds the fields to out object
         uic.loadUi(designerQTFile, self)
@@ -24,42 +24,68 @@ class MovieSuggester(QtGui.QWidget):
         for b in getWidgetsWithPrefix(self.goLayout, "nameButton"):
             b.clicked.connect(self.itemClicked)
 
-        self.suggester = Suggester()
+        self.suggester = suggester
 
-        self.rec6 = self.suggester.getInitialRecs(6)
-        self.populateButtons(rec6)
+        self.rec6 = self.suggester.getInitialRecs()
+        self.selected_movie = self.rec6[0]
+        self.populateButtons(self.rec6)
 
         self.show()
 
     def runGo(self):
         """Does the Go thing (forms the new output on the left)"""
-        self.rec6 = self.suggester.getNext(self.selected_movie, self.tags, self.directions)
-        self.populateButtons(rec6)
+        self.rec6 = self.suggester.getNextRecs(self.selected_movie, self.getTags())
+        self.populateButtons(self.rec6)
 
     def itemClicked(self):
         """Whenever we click on a movie we load the description,
            pic from IMDB and set the tags for the movie"""
         button = self.sender()
-        # self.
-        button.setText("Clicked")
+        self.selected_movie = button.text()
+        self.setTags(self.suggester.getTopTags(self.selected_movie))
 
     def getSliderValues(self):
         sliderVals = [x.value() for x in getWidgetsWithPrefix(self.tagValuesLayout)]
         return sliderVals
+
+    def populateButtons(self, buttonNames):
+        """Gets button names and sets them"""
+        for (b, n) in zip(getWidgetsWithPrefix(self.goLayout, "nameButton"), buttonNames):
+            b.setText(n)
 
     def resetSliders(self):
         sliders = getWidgetsWithPrefix(self.tagValuesLayout)
         for (s, v) in zip(sliders, self.sliderVals):
             s.setValue(v)
 
+    def getTags(self):
+        """Returns a pair of lists - tagNames and tagVals"""
+        tagVals = self.getSliderValues()
+        tags = getWidgetsWithPrefix(self.tagNamesLayout)
+        ret = []
+        for s in tags:
+            ret.append(s.text())
+        return ret, tagVals
+
+    def setTags(self, tags):
+        tag_names, self.sliderVals = tags
+        self.resetSliders()
+        self._setTagNames(tag_names)
+
+    def _setTagNames(self, tag_names):
+        tags = getWidgetsWithPrefix(self.tagNamesLayout)
+        for (s, v) in zip(tags, tag_names):
+            s.setText(v)
+
+
 
 def main():
     app = QtGui.QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)
 
-    suggester = Suggester()
+    suggester = Suggester(6)
 
-    window = MovieSuggester()
+    window = MovieSuggester(suggester)
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
