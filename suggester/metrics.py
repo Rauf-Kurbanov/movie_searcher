@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.spatial.distance as dist
 from sklearn.neighbors import NearestNeighbors
-import itertools as itt
 
 
 class Metrics:
@@ -19,7 +18,6 @@ class Metrics:
                                      for tagId in range(n_tags)])
 
         self.model = NearestNeighbors(algorithm="brute", metric=self.weightedCosSimi, n_neighbors=250)
-        # nbrs_art2 = LSHForest(n_candidates = 500, n_neighbors = 250)
         self.model.fit(self.genome)
 
     def popularity(self, tag_id):
@@ -56,26 +54,13 @@ class Metrics:
     def N(self, i):
         return self.movie_neighbours(i)
 
-    # def Np(self, i, t, Ni):
-    #     delta = 0.25
-    #     # return [j for j in Ni if self.rel(t, j) > self.rel(t, i) + delta]
-    #     return [j for j in Ni if self.genome[j, t] > self.genome[i, t] + delta]
-
     def Np(self, i, t, Ni):
         delta = 0.25
         return Ni[self.genome[Ni, t] > self.genome[i, t] + delta].size
 
-    # def Nn(self, i, t, Ni):
-    #     delta = 0.25
-    #     # return [j for j in Ni if self.rel(t, j) < self.rel(t, i) - delta]
-    #     return [j for j in Ni if self.genome[j, t] < self.genome[i, t] - delta]
-
     def Nn(self, i, t, Ni):
         delta = 0.25
         return Ni[self.genome[Ni, t] < self.genome[i, t] - delta].size
-
-    # def Nz(self, i, t, Ni):
-    #     return [j for j in Ni if j not in self.Np(i, t, Ni) and j not in self.Nn(i, t, Ni)]
 
     @staticmethod
     def critiqueEntropyH(t, i, Nd, Ni):
@@ -92,28 +77,44 @@ class Metrics:
         return res
 
     def tagSim(self, tA, tB):
-        relevanceA = self.genome[:, tA]
-        relevanceB = self.genome[:, tB]
-        return dist.cosine(relevanceA, relevanceB)
+        return dist.cosine(self.genome[:, tA], self.genome[:, tB])
 
     def objective_function(self, S, i, Ni):
-        cond1 = lambda t: self.popularity(t) >= 50
-
-        def cond2(t):
-            for u in S:
-                if t != u and self.tagSim(t, u) > 0.5:
-                    return False
-            return True
-        cond3 = lambda t: self.critiqueEntropy(t, i, Ni) > 0.325
-        ts = [t for t in S if cond1(t) and cond3(t)]
-        ts = [t for t in ts if cond2(t)]
-        ts = np.array(ts)
-        return np.sum([self.critiqueEntropy(t, i, Ni) * np.log(self.popularity(t)) for t in ts])
+        # cond1 = lambda t: self.popularity(t) >= 50
+        #
+        # def cond2(t):
+        #     for u in S:
+        #         if t != u and self.tagSim(t, u) > 0.5:
+        #             return False
+        #     return True
+        # cond3 = lambda t: self.critiqueEntropy(t, i, Ni) > 0.325
+        # ts = [t for t in S if cond1(t) and cond3(t)]
+        # ts = [t for t in ts if cond2(t)]
+        # ts = np.array(ts)
+        # return np.sum([self.critiqueEntropy(t, i, Ni) * np.log(self.popularity(t)) for t in ts])
+        res = 0
+        for t in S:
+            f = False
+            pop_t = self.tags.TagPopularity[t] + 1
+            if t < 50:
+                continue
+            c_entr_t = self.critiqueEntropy(t, i, Ni)
+            if c_entr_t < 0.325:
+                continue
+            for i in S:
+                if i == t:
+                    continue
+                arr = self.tagSim(t, i)
+                if arr > 0.5:
+                    f = True
+                    break
+            if not f:
+                res += c_entr_t * np.log(pop_t)
+        return res
 
     def critiqueDist(self, critiquedMovieId, retrievedMovieId, tagId, direction):
         ic, ir, t, d = critiquedMovieId, retrievedMovieId, tagId, direction
         return max(0, self.rel(t, ir) - self.rel(t, ic) * d)
-        # return max(0, self.rel(t, ir) - self.rel(t, ic) * d)
 
     def linearSat(self, ic, ir, t, d):
         self.critiqueDist(ic, ir, t, d)
