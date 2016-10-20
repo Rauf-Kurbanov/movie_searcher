@@ -22,12 +22,22 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QGraphicsView" name="moviePictureView"/>
+        <widget class="QLabel" name="moviePicture">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="movieSummary">
          <property name="text">
-          <string>This movie is about a dick who sucked dicks in the dickwad alley. Now he wasn't just an ordinary cocksucker, no, he was special.</string>
+          <string>This movie is about a guy who played games in the alley. Now he wasn't just ordinary, no, he was special.</string>
          </property>
          <property name="scaledContents">
           <bool>false</bool>

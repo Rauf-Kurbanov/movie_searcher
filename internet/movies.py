@@ -2,26 +2,20 @@ import requests
 from urllib.parse import quote
 
 
-class Movies:
-
-    @staticmethod
-    def imdb_id_from_title(title):
-        """ return IMDB id for search string
-
-            Args::
-                title (str): the movie title search string
-
-            Returns:
-                str. IMDB id, e.g., 'tt0095016'
-                None. If no match was found
-
-        """
-        pattern = 'http://www.imdb.com/xml/find?json=1&nr=1&tt=on&q={movie_title}'
-        url = pattern.format(movie_title=quote(title))
+def imdb_descr_and_poster_from_title(title):
+    try:
+        description_request = 'http://www.omdbapi.com/?t={movie_title}&y=&plot=full&r=json'
+        url = description_request.format(movie_title=quote(title))
         r = requests.get(url)
         res = r.json()
-        # sections in descending order or preference
-        for section in ['popular','exact','substring']:
-            key = 'title_' + section
-            if key in res:
-                return res[key][0]['id']
+
+        pic = requests.get(res['Poster']).content
+        return res['Plot'], pic
+    except (KeyError, requests.exceptions.MissingSchema):
+        print("No such thing, I guess")
+        err_file = open("internet/img.png", "rb")
+        data = err_file.read()
+        err_file.close()
+        return "Error", data
+
+

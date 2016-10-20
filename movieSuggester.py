@@ -2,13 +2,16 @@
 import sys
 from PyQt4 import QtCore, QtGui, uic
 from suggester.suggester import Suggester
+from internet.movies import imdb_descr_and_poster_from_title
 
 designerQTFile = "gui/layoutGUI.ui"
 
-def getWidgetsWithPrefix(layout, name = ""):
-    return   [b for i in range(layout.count())
-                for b in [layout.itemAt(i).widget()]
-                if name in b.objectName()]
+
+def getWidgetsWithPrefix(layout, name=""):
+    return [b for i in range(layout.count())
+            for b in [layout.itemAt(i).widget()]
+            if name in b.objectName()]
+
 
 class MovieSuggester(QtGui.QWidget):
     def __init__(self, suggester):
@@ -29,6 +32,7 @@ class MovieSuggester(QtGui.QWidget):
         self.rec6 = self.suggester.getInitialRecs()
         self.selected_movie = self.rec6[0]
         self.populateButtons(self.rec6)
+        self.populateMovieDescr()
 
         self.show()
 
@@ -37,12 +41,24 @@ class MovieSuggester(QtGui.QWidget):
         self.rec6 = self.suggester.getNextRecs(self.selected_movie, self.getTags())
         self.populateButtons(self.rec6)
 
+    def populateMovieDescr(self):
+        # Stupid naming in the dataset
+        descr, pic = imdb_descr_and_poster_from_title(
+            self.selected_movie.rsplit('(', 1)[0]
+                               .rsplit(',', 1)[0])
+        self.movieSummary.setText(descr)
+
+        image = QtGui.QImage()
+        image.loadFromData(pic)
+        self.moviePicture.setPixmap(QtGui.QPixmap(image))
+
     def itemClicked(self):
         """Whenever we click on a movie we load the description,
            pic from IMDB and set the tags for the movie"""
         button = self.sender()
         self.selected_movie = button.text()
         self.setTags(self.suggester.getTopTags(self.selected_movie))
+        self.populateMovieDescr()
 
     def getSliderValues(self):
         sliderVals = [x.value() for x in getWidgetsWithPrefix(self.tagValuesLayout)]
@@ -85,6 +101,7 @@ def main():
 
     window = MovieSuggester(suggester)
     sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     main()
