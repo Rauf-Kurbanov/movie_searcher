@@ -80,37 +80,37 @@ class Metrics:
         return dist.cosine(self.genome[:, tA], self.genome[:, tB])
 
     def objective_function(self, S, i, Ni):
-        # cond1 = lambda t: self.popularity(t) >= 50
-        #
-        # def cond2(t):
-        #     for u in S:
-        #         if t != u and self.tagSim(t, u) > 0.5:
-        #             return False
-        #     return True
-        # cond3 = lambda t: self.critiqueEntropy(t, i, Ni) > 0.325
-        # ts = [t for t in S if cond1(t) and cond3(t)]
-        # ts = [t for t in ts if cond2(t)]
-        # ts = np.array(ts)
-        # return np.sum([self.critiqueEntropy(t, i, Ni) * np.log(self.popularity(t)) for t in ts])
-        res = 0
-        for t in S:
-            f = False
-            pop_t = self.tags.TagPopularity[t] + 1
-            if t < 50:
-                continue
-            c_entr_t = self.critiqueEntropy(t, i, Ni)
-            if c_entr_t < 0.325:
-                continue
-            for i in S:
-                if i == t:
-                    continue
-                arr = self.tagSim(t, i)
-                if arr > 0.5:
-                    f = True
-                    break
-            if not f:
-                res += c_entr_t * np.log(pop_t)
-        return res
+        cond1 = lambda t: self.popularity(t) >= 50
+
+        def cond2(t):
+            for u in S:
+                if t != u and self.tagSim(t, u) > 0.5:
+                    return False
+            return True
+        cond3 = lambda t: self.critiqueEntropy(t, i, Ni) > 0.325
+        ts = [t for t in S if cond1(t) and cond3(t)]
+        ts = [t for t in ts if cond2(t)]
+        ts = np.array(ts)
+        return np.sum([self.critiqueEntropy(t, i, Ni) * np.log(self.popularity(t)) for t in ts])
+        # res = 0
+        # for t in S:
+        #     f = False
+        #     pop_t = self.tags.TagPopularity[t] + 1
+        #     if t < 50:
+        #         continue
+        #     c_entr_t = self.critiqueEntropy(t, i, Ni)
+        #     if c_entr_t < 0.325:
+        #         continue
+        #     for i in S:
+        #         if i == t:
+        #             continue
+        #         arr = self.tagSim(t, i)
+        #         if arr > 0.5:
+        #             f = True
+        #             break
+        #     if not f:
+        #         res += c_entr_t * np.log(pop_t)
+        # return res
 
     def critiqueDist(self, critiquedMovieId, retrievedMovieId, tagId, direction):
         ic, ir, t, d = critiquedMovieId, retrievedMovieId, tagId, direction
