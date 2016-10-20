@@ -77,8 +77,6 @@ class MovieSuggester(QtGui.QWidget):
         for (s, v) in zip(tags, tag_names):
             s.setText(v)
 
-
-
 def main():
     app = QtGui.QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)

@@ -31,7 +31,7 @@ class Suggester:
     def getInitialRecs(self):
         return list(self.movies.Title.loc[1:self.n_movies])
 
-    def getNextRecs(self, selectedMovies, tags):
+    def getNextRecs(self, selectedMovie, tags):
         """Gets the selected movie :: string and new tag values :: ([name], [currentVals])
            and returns a new movies list"""
         return list(self.movies.Title.loc[12:12 + self.n_movies])
@@ -42,3 +42,4 @@ class Suggester:
         f = random.randint
         return (["Yuu", "Hoo", "Woo", "Zhoo", "Cloo", "Choo"],
                 [f(0, 99), f(0, 99), f(0, 99), f(0, 99), f(0, 99), f(0, 99)])
+

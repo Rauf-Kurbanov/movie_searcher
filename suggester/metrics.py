@@ -51,32 +51,43 @@ class Metrics:
 
     def movie_neighbours(self, i):
         _, indices_art2 = self.model.kneighbors(self.genome[i, :].reshape(1, -1))
-        return indices_art2
+        return np.array(indices_art2[0])
 
     def N(self, i):
         return self.movie_neighbours(i)
 
+    # def Np(self, i, t, Ni):
+    #     delta = 0.25
+    #     # return [j for j in Ni if self.rel(t, j) > self.rel(t, i) + delta]
+    #     return [j for j in Ni if self.genome[j, t] > self.genome[i, t] + delta]
+
     def Np(self, i, t, Ni):
         delta = 0.25
-        return [j for j in Ni if self.rel(t, j) > self.rel(t, i) + delta]
+        return Ni[self.genome[Ni, t] > self.genome[i, t] + delta].size
+
+    # def Nn(self, i, t, Ni):
+    #     delta = 0.25
+    #     # return [j for j in Ni if self.rel(t, j) < self.rel(t, i) - delta]
+    #     return [j for j in Ni if self.genome[j, t] < self.genome[i, t] - delta]
 
     def Nn(self, i, t, Ni):
         delta = 0.25
-        return [j for j in Ni if self.rel(t, j) < self.rel(t, i) - delta]
+        return Ni[self.genome[Ni, t] < self.genome[i, t] - delta].size
 
-    def Nz(self, i, t, Ni):
-        return [j for j in Ni if j not in self.Np(i, t, Ni) and j not in self.Nn(i, t, Ni)]
+    # def Nz(self, i, t, Ni):
+    #     return [j for j in Ni if j not in self.Np(i, t, Ni) and j not in self.Nn(i, t, Ni)]
 
     @staticmethod
     def critiqueEntropyH(t, i, Nd, Ni):
-        modNd = len(Nd) + 1
+        modNd = Nd + 1
         modN = len(Ni)
         return - modNd / modN * np.log(modNd / modN)
 
-    def critiqueEntropy(self, t, i):
-        Ni = self.N(i)
+    def critiqueEntropy(self, t, i, Ni):
         res = 0
-        for Nd in [self.Nn(i, t, Ni), self.Nz(i, t, Ni), self.Np(i, t, Ni)]:
+        lst = [self.Nn(i, t, Ni), self.Np(i, t, Ni)]
+        lst.append(Ni.size - sum(lst))
+        for Nd in lst:
             res += self.critiqueEntropyH(t, i, Nd, Ni)
         return res
 
@@ -85,18 +96,24 @@ class Metrics:
         relevanceB = self.genome[:, tB]
         return dist.cosine(relevanceA, relevanceB)
 
-    def objective_function(self, S, i):
+    def objective_function(self, S, i, Ni):
         """|S| == 5"""
         cond1 = lambda t: self.popularity(t) >= 50
-        cond2 = lambda t: np.all(np.array([self.tagSim(t, u) < 0.5 for u in S if t != u]))
-        cond3 = lambda t: self.critiqueEntropy(t) > 0.325
-        ts = [t for t in S if cond1(t) and cond2(t) and cond3(t)]
-        iss = list(itt.repeat(i, 6))
-        return np.sum([self.critiqueEntropy(t, i) * np.log(self.popularity(t)) for t in ts])
+
+        def cond2(t):
+            for u in S:
+                if t != u and self.tagSim(t, u) < 0.5:
+                    return False
+        cond3 = lambda t: self.critiqueEntropy(t, i, Ni) > 0.325
+        ts = [t for t in S if cond1(t) and cond3(t)]
+        ts = [t for t in ts if cond2(t)]
+        ts = np.array(ts)
+        return np.sum([self.critiqueEntropy(t, i, Ni) * np.log(self.popularity(t)) for t in ts])
 
     def critiqueDist(self, critiquedMovieId, retrievedMovieId, tagId, direction):
         ic, ir, t, d = critiquedMovieId, retrievedMovieId, tagId, direction
         return max(0, self.rel(t, ir) - self.rel(t, ic) * d)
+        # return max(0, self.rel(t, ir) - self.rel(t, ic) * d)
 
     def linearSat(self, ic, ir, t, d):
         self.critiqueDist(ic, ir, t, d)
