@@ -2,15 +2,15 @@ from os.path import join as pathJoin
 import pandas as pd
 import numpy as np
 import pickle
-import random
 
+import pyximport; pyximport.install()
 from suggester.metrics import Metrics
 
 dataRootPath = "tag-genome"
 
 
 class Suggester:
-    def __init__(self, n_movies):
+    def __init__(self, int n_movies):
         movieID_tagID_relevance = pathJoin(dataRootPath, "tag_relevance.dat")
         movieID_title_movie_popularity = pathJoin(dataRootPath, "movies.dat")
         tagID_tag_tag_popularity = pathJoin(dataRootPath, "tags.dat")
@@ -36,19 +36,19 @@ class Suggester:
                 self.getMovieByName("Frozen (2013)"),
                 self.getMovieByName("12 Angry Men (1957)")]
 
-    def getMovieByName(self, name):
+    def getMovieByName(self, str name):
         return self.movies[self.movies.Title == name].Title.iloc[0]
 
-    def getNextRecs(self, selectedMovie, tags):
+    def getNextRecs(self, str selectedMovie, tags):
         """Gets the selected movie :: string and new tag values :: ([name], [currentVals])
            and returns a new movies list"""
         return list(self.movies.Title.loc[12:12 + self.n_movies])
 
-    def _movieTitleToNum(self, movie_name):
+    def _movieTitleToNum(self, str movie_name):
         movies = self.movies
         return np.argmax(movies.index.values[movies.Title == movie_name])
 
-    def getTopTags(self, movie_name):
+    def getTopTags(self, str movie_name):
         mId = self._movieTitleToNum(movie_name)
         Ni = self.metrics.N(mId)
         tagIds = []

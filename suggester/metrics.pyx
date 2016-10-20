@@ -1,8 +1,12 @@
+import pyximport
 import numpy as np
+pyximport.install(setup_args={'include_dirs': np.get_include()})
+# cimport numpy as np
 import scipy.spatial.distance as dist
 from sklearn.neighbors import NearestNeighbors
 
-
+#cython: boundscheck=False
+#cython: wraparound=False
 class Metrics:
     def __init__(self, tag_relevance, movies, tags, genome):
 
@@ -20,10 +24,10 @@ class Metrics:
         self.model = NearestNeighbors(algorithm="brute", metric=self.weightedCosSimi, n_neighbors=250)
         self.model.fit(self.genome)
 
-    def popularity(self, tag_id):
+    def popularity(self, int tag_id):
         return self.tags.TagPopularity[tag_id] + 1
 
-    def docFreq(self, tag):
+    def docFreq(self, int tag):
         byTag = self.genome[:, tag]
         specific = [x for x in byTag if x > 0.5]
         return len(specific) + 2
@@ -32,43 +36,43 @@ class Metrics:
         """Not exactly like in the article"""
         return dist.cosine(u * self.tag_weights, v * self.tag_weights)
 
-    def articleCosSimi(self, u, v):
-        """Exactly like in the article"""
-        w = self.tag_weights
-        x = np.sum(w * u * v)
-        y = np.sqrt(sum(w * u * u)) * np.sqrt(sum(w * v * v))
-        return x / y
+    # def articleCosSimi(self, u, v):
+    #     """Exactly like in the article"""
+    #     w = self.tag_weights
+    #     x = np.sum(w * u * v)
+    #     y = np.sqrt(sum(w * u * u)) * np.sqrt(sum(w * v * v))
+    #     return x / y
 
-    def rel(self, tagId, movId):
+    def rel(self, int tagId, int movId):
         return self.genome[movId, tagId]
 
-    def printNeigh(self, randMovNum):
+    def printNeigh(self, int randMovNum):
         neighbors = self.movie_neighbours(randMovNum)
         for mid in neighbors:
             print(self.movies.loc[mid]["Title"])
 
-    def movie_neighbours(self, i):
+    def movie_neighbours(self, int i):
         _, indices_art2 = self.model.kneighbors(self.genome[i, :].reshape(1, -1))
         return np.array(indices_art2[0])
 
-    def N(self, i):
+    def N(self, int i):
         return self.movie_neighbours(i)
 
-    def Np(self, i, t, Ni):
+    def Np(self, int i, int t, Ni):
         delta = 0.25
         return Ni[self.genome[Ni, t] > self.genome[i, t] + delta].size
 
-    def Nn(self, i, t, Ni):
+    def Nn(self, int i, int t, Ni):
         delta = 0.25
         return Ni[self.genome[Ni, t] < self.genome[i, t] - delta].size
 
     @staticmethod
-    def critiqueEntropyH(t, i, Nd, Ni):
+    def critiqueEntropyH(t, int i, int Nd, Ni):
         modNd = Nd + 1
         modN = len(Ni)
         return - modNd / modN * np.log(modNd / modN)
 
-    def critiqueEntropy(self, t, i, Ni):
+    def critiqueEntropy(self, int t, int i, Ni):
         res = 0
         lst = [self.Nn(i, t, Ni), self.Np(i, t, Ni)]
         lst.append(Ni.size - sum(lst))
@@ -76,10 +80,10 @@ class Metrics:
             res += self.critiqueEntropyH(t, i, Nd, Ni)
         return res
 
-    def tagSim(self, tA, tB):
+    def tagSim(self, int tA, int tB):
         return dist.cosine(self.genome[:, tA], self.genome[:, tB])
 
-    def objective_function(self, S, i, Ni):
+    def objective_function(self, S, int i, Ni):
         cond1 = lambda t: self.popularity(t) >= 50
 
         def cond2(t):
@@ -112,7 +116,7 @@ class Metrics:
         #         res += c_entr_t * np.log(pop_t)
         # return res
 
-    def critiqueDist(self, critiquedMovieId, retrievedMovieId, tagId, direction):
+    def critiqueDist(self, int critiquedMovieId, int retrievedMovieId, int tagId, int direction):
         ic, ir, t, d = critiquedMovieId, retrievedMovieId, tagId, direction
         return max(0, self.rel(t, ir) - self.rel(t, ic) * d)
 

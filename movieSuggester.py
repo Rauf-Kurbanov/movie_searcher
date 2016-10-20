@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 import sys
 from PyQt4 import QtCore, QtGui, uic
-from suggester.suggester import Suggester
 from internet.movies import imdb_descr_and_poster_from_title
+import pyximport; pyximport.install()
+from suggester.suggester import Suggester
 
 designerQTFile = "gui/layoutGUI.ui"
 
