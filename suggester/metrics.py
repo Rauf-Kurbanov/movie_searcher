@@ -97,13 +97,13 @@ class Metrics:
         return dist.cosine(relevanceA, relevanceB)
 
     def objective_function(self, S, i, Ni):
-        """|S| == 5"""
         cond1 = lambda t: self.popularity(t) >= 50
 
         def cond2(t):
             for u in S:
-                if t != u and self.tagSim(t, u) < 0.5:
+                if t != u and self.tagSim(t, u) > 0.5:
                     return False
+            return True
         cond3 = lambda t: self.critiqueEntropy(t, i, Ni) > 0.325
         ts = [t for t in S if cond1(t) and cond3(t)]
         ts = [t for t in ts if cond2(t)]
