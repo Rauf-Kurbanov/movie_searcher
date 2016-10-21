@@ -46,6 +46,7 @@ class Suggester:
     def getNextRecs(self, selectedMovie, tags):
         """Gets the selected movie :: string and new tag values :: ([name], [currentVals])
            and returns a new movies list"""
+        selectedMovie = self._movieTitleToNum(selectedMovie)
         tagNames, tagValues = tags
         directions = [1 if p < c else 0 if p == c else -1
                       for (p, c) in zip(self.prev_tag_values, tagValues)]
