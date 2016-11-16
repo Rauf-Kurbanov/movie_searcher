@@ -12,7 +12,7 @@ TAGS_RETURNED = 5
 class Logger:
     def __init__(self, path):
         self.num = len(listdir(path))
-        self.file = pathJoin(path, str(self.num))
+        self.file = pathJoin(path, str(self.num) + ".txt")
         # Depth
         self.shownNum = 0
         # uid
