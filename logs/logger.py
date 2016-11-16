@@ -10,7 +10,8 @@ TAGS_RETURNED = 5
 # uid | movIDsShown == 6 | depth | chosenID | tagIDs == 5 +1 | tagVals == 5
 
 class Logger:
-    def __init__(self, path):
+    def __init__(self, path, on):
+        self.on = on
         self.num = len(listdir(path))
         self.file = pathJoin(path, str(self.num) + ".txt")
         # Depth
@@ -20,6 +21,9 @@ class Logger:
 
     # Six movies, five tags
     def log(self, movIDsShown, chosenID, tagIDs, tagVals):
+        if not self.on:
+            return
+
         if len(movIDsShown) < MOVIES_RETURNED:
             print("Pass in correct data to logger: movies too short")
 

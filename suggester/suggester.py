@@ -12,7 +12,7 @@ dataRootPath = "tag-genome"
 MOVIES_RETURNED = 6
 TAGS_RETURNED = 5
 
-logger = Logger("logs/output")
+logger = Logger("logs/output", False)
 
 
 class Suggester:
