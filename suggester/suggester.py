@@ -48,7 +48,6 @@ class Suggester:
         logger.log([self._movieTitleToID(x) for x in ret],
                    self._movieTitleToID(ret[0]),
                    [-1] * TAGS_RETURNED,
-                   [-1] * TAGS_RETURNED,
                    [-1] * TAGS_RETURNED)
         ##################################
         return ret
@@ -79,9 +78,8 @@ class Suggester:
         ##################################
         logger.log([self._movieTitleToID(x) for x in ret],
                    self._movieTitleToID(selectedMovieName),
-                   [self._tagNameToID(x) for x in tagNames[:TAGS_RETURNED]],
-                   self.prev_tag_values,
-                   tagValues[:TAGS_RETURNED])
+                   [self._tagNameToID(x) for x in tagNames],
+                   tagValues)
         ##################################
         return ret
 
@@ -90,6 +88,17 @@ class Suggester:
 
     def _tagNameToID(self, tag_name):
         return self.tags[self.tags.Tag == tag_name].TagID.iloc[0]
+
+    def getTagNames(self):
+        return self.tags.Tag
+
+    def getTagMetric(self, tag):
+        mId = self._movieTitleToNum(self.curr_movie)
+        tId = self._tagNameToID(tag)
+        return self.genome[mId, tId] * 100
+
+    def getMovieNames(self):
+        return self.movies.Title
 
     def _movieTitleToNum(self, movie_name):
         movies = self.movies
@@ -105,7 +114,7 @@ class Suggester:
             tagIds.append(np.argmax(results))
 
         tagNames = list(self.tags.loc[tagIds,].Tag)
-        tagValues = [self.genome[mId, tid] * 100 for tid in tagIds]
+        tagValues = [self.genome[mId, tId] * 100 for tId in tagIds]
 
         self.prev_tag_values = tagValues
         return tagNames, tagValues

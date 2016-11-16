@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 import sys
 from PyQt4 import QtCore, QtGui, uic
+
+from gui.autocomplete_box import AdvComboBox
 from suggester.suggester import Suggester
 from internet.movies import imdb_descr_and_poster_from_title
 
@@ -34,6 +36,8 @@ class MovieSuggester(QtGui.QWidget):
         self.populateButtons(self.rec6)
         self.setTags(self.suggester.getTopTags(self.selected_movie))
         self.populateMovieDescr()
+
+        self.setupAutocomplete()
 
         self.show()
 
@@ -71,14 +75,14 @@ class MovieSuggester(QtGui.QWidget):
             b.setText(n)
 
     def resetSliders(self):
-        sliders = getWidgetsWithPrefix(self.tagValuesLayout)
+        sliders = getWidgetsWithPrefix(self.tagValuesLayout,)
         for (s, v) in zip(sliders, self.sliderVals):
             s.setValue(v)
 
     def getTags(self):
         """Returns a pair of lists - tagNames and tagVals"""
         tagVals = self.getSliderValues()
-        tags = getWidgetsWithPrefix(self.tagNamesLayout)
+        tags = getWidgetsWithPrefix(self.tagNamesLayout, "tag")
         ret = []
         for s in tags:
             ret.append(s.text())
@@ -90,9 +94,21 @@ class MovieSuggester(QtGui.QWidget):
         self._setTagNames(tag_names)
 
     def _setTagNames(self, tag_names):
-        tags = getWidgetsWithPrefix(self.tagNamesLayout)
+        tags = getWidgetsWithPrefix(self.tagNamesLayout, "tag")
         for (s, v) in zip(tags, tag_names):
             s.setText(v)
+
+    def updateUserTag(self):
+        tag = getWidgetsWithPrefix(self.tagValuesLayout, "tagVal6")[0]
+        box = self.sender()
+        tag.setValue(self.suggester.getTagMetric(box.currentText()))
+
+    def setupAutocomplete(self):
+        box = AdvComboBox()
+        box.addItems(self.suggester.getTagNames())
+        self.tagNamesLayout.addWidget(box)
+        box.currentIndexChanged.connect(self.updateUserTag)
+
 
 def main():
     app = QtGui.QApplication(sys.argv)
