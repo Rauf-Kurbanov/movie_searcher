@@ -98,7 +98,7 @@ def main():
     app = QtGui.QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)
 
-    suggester = Suggester(6)
+    suggester = Suggester()
 
     window = MovieSuggester(suggester)
     sys.exit(app.exec_())
