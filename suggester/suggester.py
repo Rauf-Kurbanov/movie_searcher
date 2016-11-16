@@ -5,8 +5,11 @@ import pickle
 import itertools as itt
 
 from suggester.metrics import Metrics
+from logs.logger import Logger
 
 dataRootPath = "tag-genome"
+
+logger = Logger("logs/output")
 
 
 class Suggester:
