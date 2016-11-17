@@ -66,7 +66,8 @@ class Suggester:
 
     def _movieTitleToNum(self, movie_name):
         movies = self.movies
-        return np.argmax(movies.index.values[movies.Title == movie_name])
+        # return np.argmax(movies.index.values[movies.Title == movie_name])
+        return np.where(movies.index.values[movies.Title == movie_name] == 1)[0][0]
 
     def getTopTags(self, movie_name):
         mId = self._movieTitleToNum(movie_name)
