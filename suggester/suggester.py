@@ -2,10 +2,11 @@ from os.path import join as pathJoin
 import pandas as pd
 import numpy as np
 import pickle
+import json
 import itertools as itt
 
-from suggester.metrics import Metrics
 from logs.logger import Logger
+from suggester.metrics import Metrics
 
 dataRootPath = "tag-genome"
 
@@ -36,6 +37,9 @@ class Suggester:
         # self.prev_tag_values = np.repeat(0.5, self.tags.shape[0])
         self.prev_tag_values = list(itt.repeat(0.5, self.tags.shape[0]))
         self.curr_movie = self._movieTitleToNum("Fight Club (1999)")
+
+        with open(pathJoin(dataRootPath, "json/allFilmsToTags.json")) as f:
+            self.precompTags = json.loads(f.read())
 
     def getInitialRecs(self):
         ret = [self._getMovieByName("Fight Club (1999)"),
@@ -106,6 +110,11 @@ class Suggester:
         return np.where(movies.index.values[movies.Title == movie_name] == 1)[0][0]
 
     def getTopTags(self, movie_name):
+        if (movie_name in self.precompTags):
+            print("already precomputed {}".format(movie_name))
+            tagNames, tagValues = self.precompTags[movie_name]
+            return tagNames, tagValues
+
         mId = self._movieTitleToNum(movie_name)
         Ni = self.metrics.N(mId)
         tagIds = []
