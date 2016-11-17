@@ -5,12 +5,18 @@ import pickle
 import itertools as itt
 
 from suggester.metrics import Metrics
+from logs.logger import Logger
 
 dataRootPath = "tag-genome"
 
+MOVIES_RETURNED = 6
+TAGS_RETURNED = 5
+
+logger = Logger("logs/output", False)
+
 
 class Suggester:
-    def __init__(self, n_movies):
+    def __init__(self):
         movieID_tagID_relevance = pathJoin(dataRootPath, "tag_relevance.dat")
         movieID_title_movie_popularity = pathJoin(dataRootPath, "movies.dat")
         tagID_tag_tag_popularity = pathJoin(dataRootPath, "tags.dat")
@@ -26,27 +32,33 @@ class Suggester:
             self.genome = np.array(pickle.load(f))
 
         self.metrics = Metrics(self.tag_relevance, self.movies, self.tags, self.genome)
-        self.n_movies = n_movies
 
         # self.prev_tag_values = np.repeat(0.5, self.tags.shape[0])
         self.prev_tag_values = list(itt.repeat(0.5, self.tags.shape[0]))
         self.curr_movie = self._movieTitleToNum("Fight Club (1999)")
 
     def getInitialRecs(self):
-        return [self._getMovieByName("Fight Club (1999)"),
-                self._getMovieByName("Hobbit: The Desolation of Smaug, The (2013)"),
-                self._getMovieByName("Inception (2010)"),
-                self._getMovieByName("Thor: The Dark World (2013)"),
-                self._getMovieByName("Frozen (2013)"),
-                self._getMovieByName("12 Angry Men (1957)")]
+        ret = [self._getMovieByName("Fight Club (1999)"),
+               self._getMovieByName("Hobbit: The Desolation of Smaug, The (2013)"),
+               self._getMovieByName("Inception (2010)"),
+               self._getMovieByName("Thor: The Dark World (2013)"),
+               self._getMovieByName("Frozen (2013)"),
+               self._getMovieByName("12 Angry Men (1957)")]
+        ##################################
+        logger.log([self._movieTitleToID(x) for x in ret],
+                   self._movieTitleToID(ret[0]),
+                   [-1] * TAGS_RETURNED,
+                   [-1] * TAGS_RETURNED)
+        ##################################
+        return ret
 
     def _getMovieByName(self, name):
         return self.movies[self.movies.Title == name].Title.iloc[0]
 
-    def getNextRecs(self, selectedMovie, tags):
+    def getNextRecs(self, selectedMovieName, tags):
         """Gets the selected movie :: string and new tag values :: ([name], [currentVals])
-           and returns a new movies list"""
-        selectedMovie = self._movieTitleToNum(selectedMovie)
+           and returns a new movies list :: string """
+        selectedMovie = self._movieTitleToNum(selectedMovieName)
         tagNames, tagValues = tags
         directions = [1 if p < c else 0 if p == c else -1
                       for (p, c) in zip(self.prev_tag_values, tagValues)]
@@ -60,9 +72,33 @@ class Suggester:
         for tag, d in tagAndDir:
             candidates = [c for c in candidates if self.metrics.critiqueDist(selectedMovie, c, tag, d) > 0]
 
-        candidates = sorted(candidates, key=norm)[:5]
+        candidates = sorted(candidates, key=norm)[:MOVIES_RETURNED]
         self.curr_movie = selectedMovie
-        return list(self.movies.loc[candidates].Title)
+        ret = list(self.movies.loc[candidates].Title)
+        ##################################
+        logger.log([self._movieTitleToID(x) for x in ret],
+                   self._movieTitleToID(selectedMovieName),
+                   [self._tagNameToID(x) for x in tagNames],
+                   tagValues)
+        ##################################
+        return ret
+
+    def _movieTitleToID(self, movie_name):
+        return self.movies[self.movies.Title == movie_name].MovieID.iloc[0]
+
+    def _tagNameToID(self, tag_name):
+        return self.tags[self.tags.Tag == tag_name].TagID.iloc[0]
+
+    def getTagNames(self):
+        return self.tags.Tag
+
+    def getTagMetric(self, tag):
+        mId = self._movieTitleToNum(self.curr_movie)
+        tId = self._tagNameToID(tag)
+        return self.genome[mId, tId] * 100
+
+    def getMovieNames(self):
+        return self.movies.Title
 
     def _movieTitleToNum(self, movie_name):
         movies = self.movies
@@ -73,13 +109,13 @@ class Suggester:
         mId = self._movieTitleToNum(movie_name)
         Ni = self.metrics.N(mId)
         tagIds = []
-        for i in range(5):
+        for i in range(TAGS_RETURNED):
             candidates = range(self.tags.shape[0])
             results = [self.metrics.objective_function(tagIds + [t], mId, Ni) for t in candidates if t not in tagIds]
             tagIds.append(np.argmax(results))
 
-        tagNames = list(self.tags.loc[tagIds, ].Tag)
-        tagValues = [self.genome[mId, tid] * 100 for tid in tagIds]
+        tagNames = list(self.tags.loc[tagIds,].Tag)
+        tagValues = [self.genome[mId, tId] * 100 for tId in tagIds]
 
         self.prev_tag_values = tagValues
         return tagNames, tagValues
