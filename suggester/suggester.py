@@ -60,12 +60,17 @@ class Suggester:
         return self.movies[self.movies.Title == name].Title.iloc[0]
 
     def getNextRecs(self, selectedMovieName, tags):
+        print("getNextRecs")
+        print(tags)
         """Gets the selected movie :: string and new tag values :: ([name], [currentVals])
            and returns a new movies list :: string """
         selectedMovie = self._movieTitleToNum(selectedMovieName)
         tagNames, tagValues = tags
+
+        prev_tag_values = [self.genome[selectedMovie, self._tagNameToID(tId)] * 100 for tId in tagNames]
+
         directions = [1 if p < c else 0 if p == c else -1
-                      for (p, c) in zip(self.prev_tag_values, tagValues)]
+                      for (p, c) in zip(prev_tag_values, tagValues)]
         tagAndDir = [td for td in enumerate(directions) if td[1] != 0]
 
         def norm(mId):
@@ -85,6 +90,7 @@ class Suggester:
                    [self._tagNameToID(x) for x in tagNames],
                    tagValues)
         ##################################
+        print(ret)
         return ret
 
     def _movieTitleToID(self, movie_name):
@@ -106,8 +112,8 @@ class Suggester:
 
     def _movieTitleToNum(self, movie_name):
         movies = self.movies
-        # return np.argmax(movies.index.values[movies.Title == movie_name])
-        return np.where(movies.index.values[movies.Title == movie_name] == 1)[0][0]
+        return np.argmax(movies.index.values[movies.Title == movie_name])
+        # return np.where(movies.index.values[movies.Title == movie_name] == 1)[0][0]
 
     def getTopTags(self, movie_name):
         if (movie_name in self.precompTags):
@@ -126,5 +132,5 @@ class Suggester:
         tagNames = list(self.tags.loc[tagIds,].Tag)
         tagValues = [self.genome[mId, tId] * 100 for tId in tagIds]
 
-        self.prev_tag_values = tagValues
+        # self.prev_tag_values = tagValues
         return tagNames, tagValues

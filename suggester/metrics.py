@@ -1,5 +1,9 @@
 import numpy as np
 import scipy.spatial.distance as dist
+import pickle
+
+import os
+
 from sklearn.neighbors import NearestNeighbors
 
 
@@ -19,6 +23,9 @@ class Metrics:
 
         self.model = NearestNeighbors(algorithm="brute", metric=self.weightedCosSimi, n_neighbors=250)
         self.model.fit(self.genome)
+
+        with open('./tag-genome/pickled/precomp-knn-250.pickle', 'rb') as f:
+            self.precomputedKNN = pickle.load(f)
 
     def popularity(self, tag_id):
         return self.tags.TagPopularity[tag_id] + 1
@@ -50,6 +57,10 @@ class Metrics:
     def movie_neighbours(self, i):
         _, indices_art2 = self.model.kneighbors(self.genome[i, :].reshape(1, -1))
         return np.array(indices_art2[0])
+
+    # def movie_neighbours(self, i):
+    #     clusters = self.precomputedKNN[1]
+    #     return clusters[i]
 
     def N(self, i):
         return self.movie_neighbours(i)
