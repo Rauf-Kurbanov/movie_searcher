@@ -37,6 +37,7 @@ class MovieSuggester(QtGui.QWidget):
         self.setTags(self.suggester.getTopTags(self.selected_movie))
         self.populateMovieDescr()
 
+        self.tagsExtra = False
         self.setupAutocomplete()
 
         self.show()
@@ -86,6 +87,11 @@ class MovieSuggester(QtGui.QWidget):
         ret = []
         for s in tags:
             ret.append(s.text())
+
+        # if self.tagsExtra:
+        self.tagsExtra = False
+        ret.append(getWidgetsWithPrefix(self.tagNamesLayout)[5].currentText())
+
         return ret, tagVals
 
     def setTags(self, tags):
@@ -101,6 +107,7 @@ class MovieSuggester(QtGui.QWidget):
     def updateUserTag(self):
         tag = getWidgetsWithPrefix(self.tagValuesLayout, "tagVal6")[0]
         box = self.sender()
+        self.tagsExtra = True
         tag.setValue(self.suggester.getTagMetric(box.currentText()))
 
     def setupAutocomplete(self):
