@@ -95,7 +95,8 @@ class MovieSuggester(QtGui.QWidget):
         tag_names, self.sliderVals = tags
         self._setTagNames(tag_names)
         self.sliderVals.append(self.suggester.getTagMetric(
-            getWidgetsWithPrefix(self.tagNamesLayout)[-1].currentText()
+            getWidgetsWithPrefix(self.tagNamesLayout)[-1].currentText(),
+            self.selected_movie
         ))
         self.resetSliders()
 
@@ -108,7 +109,7 @@ class MovieSuggester(QtGui.QWidget):
         tag = getWidgetsWithPrefix(self.tagValuesLayout, "tagVal6")[0]
         box = self.sender()
         self.tagsExtra = True
-        tag.setValue(self.suggester.getTagMetric(box.currentText()))
+        tag.setValue(self.suggester.getTagMetric(box.currentText(), self.selected_movie))
 
     def updateMovie(self):
         box = self.sender()

@@ -1,5 +1,6 @@
 from os.path import join as pathJoin
 from random import randint
+from math import floor
 
 import pandas as pd
 import numpy as np
@@ -31,6 +32,8 @@ class Suggester:
                                   names=['MovieID', 'Title', 'MoviePopularity'])
         self.tags = pd.read_csv(tagID_tag_tag_popularity, delimiter='\t', header=None,
                                 names=['TagID', 'Tag', 'TagPopularity'])
+        self.prev_tag_ids = []
+        self.prev_tag_values = []
 
         with open(pathJoin(dataRootPath, 'pickled/genome.pickle'), 'rb') as f:
             self.genome = np.array(pickle.load(f))
@@ -74,10 +77,21 @@ class Suggester:
         tagNames, tagValues = tags
 
         prev_tag_values = [self.genome[selectedMovie, self._tagNameToID(tId)] * 100 for tId in tagNames]
+        prev_tag_values = [int(floor(x)) for x in prev_tag_values]
+
+        print("##############################")
+        print(tagNames)
+        print(prev_tag_values)
+        print(tagValues)
+        print("##############################")
 
         directions = [1 if p < c else 0 if p == c else -1
                       for (p, c) in zip(prev_tag_values, tagValues)]
-        tagAndDir = [td for td in enumerate(directions) if td[1] != 0]
+        print("directions: {}".format(directions))
+
+        tids = [self._tagNameToID(name) for name in tagNames]
+        tagAndDir = [td for td in zip(tids, directions) if td[1] != 0]
+        print("tagAndDir : {}".format(tagAndDir))
 
         def norm(mId):
             return np.product([self.metrics.critiqueFit(selectedMovie, mId, tag, d)
@@ -112,8 +126,8 @@ class Suggester:
     def getTagNames(self):
         return self.tags.Tag
 
-    def getTagMetric(self, tag):
-        mId = self._movieTitleToNum(self.curr_movie)
+    def getTagMetric(self, tag, curr_movie):
+        mId = self._movieTitleToNum(curr_movie)
         tId = self._tagNameToID(tag)
         return self.genome[mId, tId] * 100
 
@@ -148,6 +162,8 @@ class Suggester:
                     tagIds[i] = r
 
             tagNames = list(self.tags.loc[tagIds].Tag)
+            # print("tagValues: {}",format(tagValues))
+            tagValues = [int(x) for x in tagValues]
             return tagNames, tagValues
 
         # mId = self._movieTitleToNum(movie_name)
