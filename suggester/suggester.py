@@ -77,7 +77,6 @@ class Suggester:
         tagNames, tagValues = tags
 
         prev_tag_values = [int(self.genome[selectedMovie, self._tagNameToID(tId)] * 100) for tId in tagNames]
-        prev_tag_values = [int(floor(x)) for x in prev_tag_values]
 
         print("##############################")
         print(tagNames)
@@ -85,19 +84,22 @@ class Suggester:
         print(tagValues)
         print("##############################")
 
-        directions = [1 if p < c else 0 if p == c else -1
+        abso = lambda p, c: 10 * abs(p - c)
+
+        directions = [abso(p, c) if p < c else 0 if p == c else -abso(p, c)
                       for (p, c) in zip(prev_tag_values, tagValues)]
-        print("directions: {}".format(directions))
+        # print("directions: {}".format(directions))
 
         tids = [self._tagNameToID(name) for name in tagNames]
         tagAndDir = [td for td in zip(tids, directions) if td[1] != 0]
-        print("tagAndDir : {}".format(tagAndDir))
+        # print("tagAndDir : {}".format(tagAndDir))
 
         def norm(mId):
-            return np.product([self.metrics.critiqueFit(selectedMovie, mId, tag, d)
+            return np.prod([self.metrics.critiqueFit(selectedMovie, mId, tag, d)
                                for tag, d in tagAndDir])
 
         candidates = self.metrics.movie_neighbours(selectedMovie)
+        # candidates = range(self.movies.shape[0])
         for tag, d in tagAndDir:
             candidates = [c for c in candidates if self.metrics.critiqueDist(selectedMovie, c, tag, d) > 0]
 
