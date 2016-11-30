@@ -15,6 +15,7 @@ dataRootPath = "tag-genome"
 MOVIES_RETURNED = 6
 TAGS_RETURNED = 5
 
+# Sets logging on and off
 logger = Logger("logs/output", False)
 
 
@@ -36,7 +37,6 @@ class Suggester:
 
         self.metrics = Metrics(self.tag_relevance, self.movies, self.tags, self.genome)
 
-        # self.prev_tag_values = np.repeat(0.5, self.tags.shape[0])
         self.prev_tag_values = list(itt.repeat(0.5, self.tags.shape[0]))
         self.curr_movie = self._movieTitleToNum("Fight Club (1999)")
 
@@ -51,12 +51,16 @@ class Suggester:
                self._getMovieByName("Frozen (2013)"),
                self._getMovieByName("12 Angry Men (1957)")]
         ##################################
-        logger.log([self._movieTitleToID(x) for x in ret],
-                   self._movieTitleToID(ret[0]),
-                   [-1] * TAGS_RETURNED,
-                   [-1] * TAGS_RETURNED)
+        # logger.log([self._movieTitleToID(x) for x in ret],
+        #            self._movieTitleToID(ret[0]),
+        #            [-1] * TAGS_RETURNED,
+        #            [-1] * TAGS_RETURNED)
         ##################################
         return ret
+
+    @staticmethod
+    def resetLogger():
+        logger.reset()
 
     def _getMovieByName(self, name):
         return self.movies[self.movies.Title == name].Title.iloc[0]
@@ -91,6 +95,10 @@ class Suggester:
                    self._movieTitleToID(selectedMovieName),
                    [self._tagNameToID(x) for x in tagNames],
                    tagValues)
+        # logger.log(ret,
+        #            selectedMovieName,
+        #            tagNames,
+        #            tagValues)
         ##################################
         print(ret)
         return ret
@@ -127,7 +135,7 @@ class Suggester:
 
     def getTopTags(self, movie_name, precomputed=True):
         if precomputed and movie_name in self.precompTags:
-            print("already precomputed {}".format(movie_name))
+            #print("already precomputed {}".format(movie_name))
             tagNames, tagValues = self.precompTags[movie_name]
             if "007" in tagNames:
 

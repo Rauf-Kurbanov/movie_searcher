@@ -30,6 +30,7 @@ class MovieSuggester(QtGui.QWidget):
             b.clicked.connect(self.itemClicked)
 
         self.suggester = suggester
+        self.setupAutocomplete()
 
         self.rec6 = self.suggester.getInitialRecs()
         self.selected_movie = self.rec6[0]
@@ -37,15 +38,14 @@ class MovieSuggester(QtGui.QWidget):
         self.setTags(self.suggester.getTopTags(self.selected_movie))
         self.populateMovieDescr()
 
-        self.tagsExtra = False
-        self.setupAutocomplete()
-
         self.show()
 
     def runGo(self):
         """Does the Go thing (forms the new output on the left)"""
         self.rec6 = self.suggester.getNextRecs(self.selected_movie, self.getTags())
         self.populateButtons(self.rec6)
+        QtCore.QMetaObject.invokeMethod(
+            getWidgetsWithPrefix(self.goLayout, "nameButton")[0], "clicked")
 
     def populateMovieDescr(self):
         # Stupid naming in the dataset
@@ -76,7 +76,7 @@ class MovieSuggester(QtGui.QWidget):
             b.setText(n)
 
     def resetSliders(self):
-        sliders = getWidgetsWithPrefix(self.tagValuesLayout,)
+        sliders = getWidgetsWithPrefix(self.tagValuesLayout)
         for (s, v) in zip(sliders, self.sliderVals):
             s.setValue(v)
 
@@ -87,17 +87,17 @@ class MovieSuggester(QtGui.QWidget):
         ret = []
         for s in tags:
             ret.append(s.text())
-
-        # if self.tagsExtra:
-        self.tagsExtra = False
-        ret.append(getWidgetsWithPrefix(self.tagNamesLayout)[5].currentText())
+        ret.append(getWidgetsWithPrefix(self.tagNamesLayout)[-1].currentText())
 
         return ret, tagVals
 
     def setTags(self, tags):
         tag_names, self.sliderVals = tags
-        self.resetSliders()
         self._setTagNames(tag_names)
+        self.sliderVals.append(self.suggester.getTagMetric(
+            getWidgetsWithPrefix(self.tagNamesLayout)[-1].currentText()
+        ))
+        self.resetSliders()
 
     def _setTagNames(self, tag_names):
         tags = getWidgetsWithPrefix(self.tagNamesLayout, "tag")
@@ -110,11 +110,23 @@ class MovieSuggester(QtGui.QWidget):
         self.tagsExtra = True
         tag.setValue(self.suggester.getTagMetric(box.currentText()))
 
+    def updateMovie(self):
+        box = self.sender()
+        self.selected_movie = box.currentText()
+        self.suggester.resetLogger()
+        self.setTags(self.suggester.getTopTags(self.selected_movie))
+        self.populateMovieDescr()
+
     def setupAutocomplete(self):
         box = AdvComboBox()
         box.addItems(self.suggester.getTagNames())
         self.tagNamesLayout.addWidget(box)
         box.currentIndexChanged.connect(self.updateUserTag)
+
+        box = AdvComboBox()
+        box.addItems(self.suggester.getMovieNames())
+        self.goLayout.insertWidget(0, box)
+        box.currentIndexChanged.connect(self.updateMovie)
 
 
 def main():
