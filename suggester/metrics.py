@@ -138,7 +138,7 @@ class Metrics:
 
     def critiqueDist(self, critiquedMovieId, retrievedMovieId, tagId, direction):
         ic, ir, t, d = critiquedMovieId, retrievedMovieId, tagId, direction
-        return max(0, self.rel(t, ir) - self.rel(t, ic) * d)
+        return max(0, (self.rel(t, ir) - self.rel(t, ic)) * d)
 
     def linearSat(self, ic, ir, t, d):
         return self.critiqueDist(ic, ir, t, d)
