@@ -76,7 +76,7 @@ class Suggester:
         selectedMovie = self._movieTitleToNum(selectedMovieName)
         tagNames, tagValues = tags
 
-        prev_tag_values = [self.genome[selectedMovie, self._tagNameToID(tId)] * 100 for tId in tagNames]
+        prev_tag_values = [int(self.genome[selectedMovie, self._tagNameToID(tId)] * 100) for tId in tagNames]
         prev_tag_values = [int(floor(x)) for x in prev_tag_values]
 
         print("##############################")
@@ -129,7 +129,7 @@ class Suggester:
     def getTagMetric(self, tag, curr_movie):
         mId = self._movieTitleToNum(curr_movie)
         tId = self._tagNameToID(tag)
-        return self.genome[mId, tId] * 100
+        return int(self.genome[mId, tId] * 100)
 
     def getMovieNames(self):
         return self.movies.Title
@@ -149,7 +149,7 @@ class Suggester:
 
     def getTopTags(self, movie_name):
         if movie_name in self.precompTags:
-            tagNames, tagValues = self.precompTags[movie_name]
+            tagNames, _ = self.precompTags[movie_name]
 
             tagIds = [self._tagNameToID(name) for name in tagNames]
             if 0 in tagIds:
@@ -162,8 +162,7 @@ class Suggester:
                     tagIds[i] = r
 
             tagNames = list(self.tags.loc[tagIds].Tag)
-            # print("tagValues: {}",format(tagValues))
-            tagValues = [int(x) for x in tagValues]
+            tagValues = [self.getTagMetric(x, movie_name) for x in tagNames]
             return tagNames, tagValues
 
         # mId = self._movieTitleToNum(movie_name)
