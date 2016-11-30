@@ -7,6 +7,7 @@ class AdvComboBox(QtGui.QComboBox):
 
         self.setEditable(True)
         self.setInsertPolicy(QtGui.QComboBox.NoInsert)
+        self.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToMinimumContentsLength)
 
         # add a filter model to filter matching items
         self.pFilterModel = QtGui.QSortFilterProxyModel(self)
