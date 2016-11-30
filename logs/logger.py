@@ -7,13 +7,16 @@ MOVIES_RETURNED = 6
 TAGS_RETURNED = 5
 
 
-# uid | movIDsShown == 6 | depth | chosenID | tagIDs == 5 +1 | tagVals == 5
+# uid | movIDsShown == 6 | depth | chosenID | tagIDs == 5 + 1 | tagVals == 5
 
 class Logger:
     def __init__(self, path, on):
         self.on = on
         self.num = len(listdir(path))
         self.file = pathJoin(path, str(self.num) + ".txt")
+        self.reset()
+
+    def reset(self):
         # Depth
         self.shownNum = 0
         # uid

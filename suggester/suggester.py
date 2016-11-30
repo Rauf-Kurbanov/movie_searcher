@@ -34,7 +34,6 @@ class Suggester:
 
         self.metrics = Metrics(self.tag_relevance, self.movies, self.tags, self.genome)
 
-        # self.prev_tag_values = np.repeat(0.5, self.tags.shape[0])
         self.prev_tag_values = list(itt.repeat(0.5, self.tags.shape[0]))
         self.curr_movie = self._movieTitleToNum("Fight Club (1999)")
 
@@ -55,6 +54,10 @@ class Suggester:
                    [-1] * TAGS_RETURNED)
         ##################################
         return ret
+
+    @staticmethod
+    def resetLogger():
+        logger.reset()
 
     def _getMovieByName(self, name):
         return self.movies[self.movies.Title == name].Title.iloc[0]
