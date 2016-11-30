@@ -84,11 +84,11 @@ class Suggester:
         print(tagValues)
         print("##############################")
 
-        abso = lambda p, c: 10 * abs(p - c)
+        abso = lambda p, c: abs(p - c) / 10
 
         directions = [abso(p, c) if p < c else 0 if p == c else -abso(p, c)
                       for (p, c) in zip(prev_tag_values, tagValues)]
-        # print("directions: {}".format(directions))
+        directions[5] *= 5
 
         tids = [self._tagNameToID(name) for name in tagNames]
         tagAndDir = [td for td in zip(tids, directions) if td[1] != 0]
