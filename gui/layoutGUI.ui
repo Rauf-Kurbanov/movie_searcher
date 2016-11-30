@@ -115,6 +115,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
            <property name="value">
             <number>50</number>
            </property>
@@ -130,6 +133,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="maximum">
+            <number>100</number>
            </property>
            <property name="value">
             <number>23</number>
@@ -147,6 +153,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
            <property name="value">
             <number>78</number>
            </property>
@@ -162,6 +171,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="maximum">
+            <number>100</number>
            </property>
            <property name="value">
             <number>34</number>
@@ -179,6 +191,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
            <property name="value">
             <number>99</number>
            </property>
@@ -194,6 +209,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="maximum">
+            <number>100</number>
            </property>
            <property name="value">
             <number>0</number>
