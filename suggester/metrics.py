@@ -54,13 +54,13 @@ class Metrics:
         for mid in neighbors:
             print(self.movies.loc[mid]["Title"])
 
-    def movie_neighbours(self, i):
-        _, indices_art2 = self.model.kneighbors(self.genome[i, :].reshape(1, -1))
-        return np.array(indices_art2[0])
-
     # def movie_neighbours(self, i):
-    #     clusters = self.precomputedKNN[1]
-    #     return clusters[i]
+    #     _, indices_art2 = self.model.kneighbors(self.genome[i, :].reshape(1, -1))
+    #     return np.array(indices_art2[0])
+
+    def movie_neighbours(self, i):
+        clusters = self.precomputedKNN[1]
+        return clusters[i]
 
     def N(self, i):
         return self.movie_neighbours(i)
