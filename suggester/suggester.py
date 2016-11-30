@@ -1,4 +1,6 @@
 from os.path import join as pathJoin
+from random import randint
+
 import pandas as pd
 import numpy as np
 import pickle
@@ -64,10 +66,10 @@ class Suggester:
         return self.movies[self.movies.Title == name].Title.iloc[0]
 
     def getNextRecs(self, selectedMovieName, tags):
-        print("getNextRecs")
-        print(tags)
         """Gets the selected movie :: string and new tag values :: ([name], [currentVals])
            and returns a new movies list :: string """
+        print("getNextRecs")
+        print(tags)
         selectedMovie = self._movieTitleToNum(selectedMovieName)
         tagNames, tagValues = tags
 
@@ -123,22 +125,69 @@ class Suggester:
         return np.argmax(movies.index.values[movies.Title == movie_name])
         # return np.where(movies.index.values[movies.Title == movie_name] == 1)[0][0]
 
-    def getTopTags(self, movie_name):
-        if movie_name in self.precompTags:
-            # print("already precomputed {}".format(movie_name))
-            tagNames, tagValues = self.precompTags[movie_name]
-            return tagNames, tagValues
-
-        mId = self._movieTitleToNum(movie_name)
-        Ni = self.metrics.N(mId)
+    def _topTagsGreedy(self, mId, Ni, obj_function):
         tagIds = []
         for i in range(TAGS_RETURNED):
             candidates = range(self.tags.shape[0])
-            results = [self.metrics.objective_function(tagIds + [t], mId, Ni) for t in candidates if t not in tagIds]
+            results = [obj_function(tagIds + [t], mId, Ni) for t in candidates if t not in tagIds]
             tagIds.append(np.argmax(results))
+        return tagIds
 
-        tagNames = list(self.tags.loc[tagIds,].Tag)
-        tagValues = [self.genome[mId, tId] * 100 for tId in tagIds]
+    def getTopTags(self, movie_name):
+        if movie_name in self.precompTags:
+            tagNames, tagValues = self.precompTags[movie_name]
 
-        # self.prev_tag_values = tagValues
-        return tagNames, tagValues
+            tagIds = [self._tagNameToID(name) for name in tagNames]
+            if 0 in tagIds:
+                values = np.array(tagIds)
+                where_zero = np.where(values == 0)[0]
+                for i in where_zero:
+                    r = randint(0, self.tags.shape[0])
+                    while r in tagIds:
+                        r = randint(self.tags.shape[0])
+                    tagIds[i] = r
+
+            tagNames = list(self.tags.loc[tagIds].Tag)
+            return tagNames, tagValues
+
+        # mId = self._movieTitleToNum(movie_name)
+        # Ni = self.metrics.N(mId)
+        #
+        # print("Using softer objective function")
+        # tagIds = self._topTagsGreedy(mId, Ni, self.metrics.softer_objective_function)
+        #
+        # # For now I's assuming tag zero in missing tag, not "007"
+        # # if 0 in tagIds:
+        # #     print("Couldnt find all tags")
+        # #     print("Number of missing tags: {}", tagIds.count(0))
+        # #     print("Using softer objective function")
+        # #     tagIds = self._topTagsGreedy(mId, Ni, self.metrics.softer_objective_function)
+        #
+        # # if 0 in tagIds:
+        # #     print("Using much softer objective function")
+        # #     tagIds = self._topTagsGreedy(mId, Ni, self.metrics.much_softer_objective_function)
+        # #
+        # # if 0 in tagIds:
+        # #     print("Using very much softer objective function")
+        # #     tagIds = self._topTagsGreedy(mId, Ni, self.metrics.much_much_softer_objective_function)
+        #
+        # if 0 in tagIds:
+        #     print("Inserting random tags instead of missing ones")
+        #     values = np.array(tagIds)
+        #     where_zero = np.where(values == 0)[0]
+        #     for i in where_zero:
+        #         r = randint(0, self.tags.shape[0])
+        #         print("R = {}", r)
+        #         while r in tagIds:
+        #             r = randint(self.tags.shape[0])
+        #         tagIds[i] = r
+        #
+        # tagNames = list(self.tags.loc[tagIds, ].Tag)
+        # tagValues = [self.genome[mId, tId] * 100 for tId in tagIds]
+        #
+        # # self.prev_tag_values = tagValues
+        # print("Top tags")
+        # print("Tag names: {}".format(tagNames))
+        # print("Tag values: {}".format(tagValues))
+        #
+        # return tagNames, tagValues

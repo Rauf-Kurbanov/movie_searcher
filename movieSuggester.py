@@ -107,6 +107,7 @@ class MovieSuggester(QtGui.QWidget):
     def updateUserTag(self):
         tag = getWidgetsWithPrefix(self.tagValuesLayout, "tagVal6")[0]
         box = self.sender()
+        self.tagsExtra = True
         tag.setValue(self.suggester.getTagMetric(box.currentText()))
 
     def updateMovie(self):

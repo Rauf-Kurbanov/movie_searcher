@@ -90,15 +90,28 @@ class Metrics:
     def tagSim(self, tA, tB):
         return dist.cosine(self.genome[:, tA], self.genome[:, tB])
 
-    def objective_function(self, S, i, Ni):
-        cond1 = lambda t: self.popularity(t) >= 50
+    def softer_objective_function(self, S, i, Ni):
+        return self.objective_function(S, i, Ni, filter3=False)
+
+    def much_softer_objective_function(self, S, i, Ni):
+        return self.objective_function(S, i, Ni, filter1=False, filter3=False)
+
+    def much_much_softer_objective_function(self, S, i, Ni):
+        return self.objective_function(S, i, Ni, filter1=False, filter2=False, filter3=False)
+
+    def objective_function(self, S, i, Ni, filter1=True, filter2=True, filter3=True):
+        cond1 = lambda t: self.popularity(t) >= 50 if filter1 else lambda x: True
 
         def cond2(t):
+            if not filter2:
+                return True
+
             for u in S:
                 if t != u and self.tagSim(t, u) > 0.5:
                     return False
             return True
-        cond3 = lambda t: self.critiqueEntropy(t, i, Ni) > 0.325
+
+        cond3 = lambda t: self.critiqueEntropy(t, i, Ni) > 0.325 if filter3 else lambda x: True
         ts = [t for t in S if cond1(t) and cond3(t)]
         ts = [t for t in ts if cond2(t)]
         ts = np.array(ts)
