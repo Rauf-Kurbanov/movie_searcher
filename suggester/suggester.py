@@ -84,26 +84,27 @@ class Suggester:
         print(tagValues)
         print("##############################")
 
-        abso = lambda p, c: abs(p - c) / 10
+        abso = lambda p, c: abs(p - c)
 
         directions = [abso(p, c) if p < c else 0 if p == c else -abso(p, c)
                       for (p, c) in zip(prev_tag_values, tagValues)]
-        directions[5] *= 5
+        # directions[5] *= 5
 
         tids = [self._tagNameToID(name) for name in tagNames]
         tagAndDir = [td for td in zip(tids, directions) if td[1] != 0]
         # print("tagAndDir : {}".format(tagAndDir))
 
         def norm(mId):
-            return np.prod([self.metrics.critiqueFit(selectedMovie, mId, tag, d)
-                               for tag, d in tagAndDir])
+            return -np.sum([self.metrics.critiqueFit(selectedMovie, mId, tag, d)
+                            for tag, d in tagAndDir])
 
         candidates = self.metrics.movie_neighbours(selectedMovie)
         # candidates = range(self.movies.shape[0])
-        for tag, d in tagAndDir:
-            candidates = [c for c in candidates if self.metrics.critiqueDist(selectedMovie, c, tag, d) > 0]
+        # for tag, d in tagAndDir:
+        #     candidates = [self.metrics.critiqueDist(selectedMovie, c, tag, d) for c in candidates]
 
         candidates = sorted(candidates, key=norm)[:MOVIES_RETURNED]
+        # print([norm(x) for x in candidates][:MOVIES_RETURNED])
         self.curr_movie = selectedMovie
         ret = list(self.movies.loc[candidates].Title)
         ##################################

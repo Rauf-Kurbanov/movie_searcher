@@ -138,11 +138,12 @@ class Metrics:
 
     def critiqueDist(self, critiquedMovieId, retrievedMovieId, tagId, direction):
         ic, ir, t, d = critiquedMovieId, retrievedMovieId, tagId, direction
-        return max(0, (self.rel(t, ir) - self.rel(t, ic)) * d)
+        return (self.rel(t, ir) - self.rel(t, ic)) * d / 100
 
     def linearSat(self, ic, ir, t, d):
         return self.critiqueDist(ic, ir, t, d)
 
+    # maybe later
     def diminishSat(self, ic, ir, t, d):
         return 1 - np.exp(-5 * self.critiqueDist(ic, ir, t, d))
 
