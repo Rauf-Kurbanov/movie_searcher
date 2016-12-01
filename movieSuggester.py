@@ -24,6 +24,7 @@ class MovieSuggester(QtGui.QWidget):
         self.sliderVals = self.getSliderValues()
 
         self.resetButton.clicked.connect(self.resetSliders)
+        self.loggerButton.clicked.connect(lambda: self.suggester.resetLogger(completely=True))
         self.goButton.clicked.connect(self.runGo)
         # Connecting buttons of the movies to the function
         for b in getWidgetsWithPrefix(self.goLayout, "nameButton"):
