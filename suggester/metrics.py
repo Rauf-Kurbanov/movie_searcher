@@ -150,4 +150,4 @@ class Metrics:
         return res if cd > 0 else -res / 2.
 
     def critiqueFit(self, ic, ir, t, d):
-        return self.linearSat(ic, ir, t, d) # * self.articleCosSimi(ic, ir) # amounts to nothing
+        return self.diminishSat(ic, ir, t, d) # * self.articleCosSimi(ic, ir) # amounts to nothing
