@@ -17,7 +17,7 @@ MOVIES_RETURNED = 6
 TAGS_RETURNED = 5
 
 # Sets logging on and off
-logger = Logger("logs/output", False)
+logger = Logger("logs/output", True)
 
 
 class Suggester:
@@ -62,8 +62,8 @@ class Suggester:
         return ret
 
     @staticmethod
-    def resetLogger():
-        logger.reset()
+    def resetLogger(completely=False):
+        logger.reset(completely)
 
     def _getMovieByName(self, name):
         return self.movies[self.movies.Title == name].Title.iloc[0]
@@ -92,6 +92,7 @@ class Suggester:
 
         tids = [self._tagNameToID(name) for name in tagNames]
         tagAndDir = [td for td in zip(tids, directions) if td[1] != 0]
+
         # print("tagAndDir : {}".format(tagAndDir))
 
         def norm(mId):
@@ -101,8 +102,8 @@ class Suggester:
         candidates = self.metrics.movie_neighbours(selectedMovie)
         # candidates = range(self.movies.shape[0])
         # for tag, d in tagAndDir:
-            # print(sorted([self.metrics.critiqueDist(selectedMovie, c, tag, d) for c in candidates])[-5])
-            # print(sorted([self.metrics.articleCosSimi(selectedMovie, c) for c in candidates])[-5])
+        # print(sorted([self.metrics.critiqueDist(selectedMovie, c, tag, d) for c in candidates])[-5])
+        # print(sorted([self.metrics.articleCosSimi(selectedMovie, c) for c in candidates])[-5])
 
         candidates = sorted(candidates, key=norm)[:MOVIES_RETURNED]
         # print([norm(x) for x in candidates][:MOVIES_RETURNED])
@@ -169,44 +170,44 @@ class Suggester:
             tagValues = [self.getTagMetric(x, movie_name) for x in tagNames]
             return tagNames, tagValues
 
-        # mId = self._movieTitleToNum(movie_name)
-        # Ni = self.metrics.N(mId)
-        #
-        # print("Using softer objective function")
-        # tagIds = self._topTagsGreedy(mId, Ni, self.metrics.softer_objective_function)
-        #
-        # # For now I's assuming tag zero in missing tag, not "007"
-        # # if 0 in tagIds:
-        # #     print("Couldnt find all tags")
-        # #     print("Number of missing tags: {}", tagIds.count(0))
-        # #     print("Using softer objective function")
-        # #     tagIds = self._topTagsGreedy(mId, Ni, self.metrics.softer_objective_function)
-        #
-        # # if 0 in tagIds:
-        # #     print("Using much softer objective function")
-        # #     tagIds = self._topTagsGreedy(mId, Ni, self.metrics.much_softer_objective_function)
-        # #
-        # # if 0 in tagIds:
-        # #     print("Using very much softer objective function")
-        # #     tagIds = self._topTagsGreedy(mId, Ni, self.metrics.much_much_softer_objective_function)
-        #
-        # if 0 in tagIds:
-        #     print("Inserting random tags instead of missing ones")
-        #     values = np.array(tagIds)
-        #     where_zero = np.where(values == 0)[0]
-        #     for i in where_zero:
-        #         r = randint(0, self.tags.shape[0])
-        #         print("R = {}", r)
-        #         while r in tagIds:
-        #             r = randint(self.tags.shape[0])
-        #         tagIds[i] = r
-        #
-        # tagNames = list(self.tags.loc[tagIds, ].Tag)
-        # tagValues = [self.genome[mId, tId] * 100 for tId in tagIds]
-        #
-        # # self.prev_tag_values = tagValues
-        # print("Top tags")
-        # print("Tag names: {}".format(tagNames))
-        # print("Tag values: {}".format(tagValues))
-        #
-        # return tagNames, tagValues
+            # mId = self._movieTitleToNum(movie_name)
+            # Ni = self.metrics.N(mId)
+            #
+            # print("Using softer objective function")
+            # tagIds = self._topTagsGreedy(mId, Ni, self.metrics.softer_objective_function)
+            #
+            # # For now I's assuming tag zero in missing tag, not "007"
+            # # if 0 in tagIds:
+            # #     print("Couldnt find all tags")
+            # #     print("Number of missing tags: {}", tagIds.count(0))
+            # #     print("Using softer objective function")
+            # #     tagIds = self._topTagsGreedy(mId, Ni, self.metrics.softer_objective_function)
+            #
+            # # if 0 in tagIds:
+            # #     print("Using much softer objective function")
+            # #     tagIds = self._topTagsGreedy(mId, Ni, self.metrics.much_softer_objective_function)
+            # #
+            # # if 0 in tagIds:
+            # #     print("Using very much softer objective function")
+            # #     tagIds = self._topTagsGreedy(mId, Ni, self.metrics.much_much_softer_objective_function)
+            #
+            # if 0 in tagIds:
+            #     print("Inserting random tags instead of missing ones")
+            #     values = np.array(tagIds)
+            #     where_zero = np.where(values == 0)[0]
+            #     for i in where_zero:
+            #         r = randint(0, self.tags.shape[0])
+            #         print("R = {}", r)
+            #         while r in tagIds:
+            #             r = randint(self.tags.shape[0])
+            #         tagIds[i] = r
+            #
+            # tagNames = list(self.tags.loc[tagIds, ].Tag)
+            # tagValues = [self.genome[mId, tId] * 100 for tId in tagIds]
+            #
+            # # self.prev_tag_values = tagValues
+            # print("Top tags")
+            # print("Tag names: {}".format(tagNames))
+            # print("Tag values: {}".format(tagValues))
+            #
+            # return tagNames, tagValues

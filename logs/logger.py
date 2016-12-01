@@ -17,13 +17,12 @@ class Logger:
         self.on = on
         self.num = len(listdir(path))
         self.file = pathJoin(path, str(self.num) + ".txt")
-        # Depth
-        self.shownNum = 0
-        # uid
-        self.uid = random.randint(0, 100000000)
+        self.reset(True)
 
-    def reset(self):
+    def reset(self, completely=False):
         self.shownNum = 0
+        if completely:
+            self.uid = random.randint(0, 100000000)
 
     # Six movies, five tags
     def log(self, movIDsShown, chosenID, tagIDs, tagVals):

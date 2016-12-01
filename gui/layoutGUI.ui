@@ -354,6 +354,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="loggerButton">
+       <property name="text">
+        <string>Reset Logger</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>
