@@ -138,14 +138,16 @@ class Metrics:
 
     def critiqueDist(self, critiquedMovieId, retrievedMovieId, tagId, direction):
         ic, ir, t, d = critiquedMovieId, retrievedMovieId, tagId, direction
-        return (self.rel(t, ir) - self.rel(t, ic)) * d / 100
+        return (self.rel(t, ir) - self.rel(t, ic)) * d / 100.
 
     def linearSat(self, ic, ir, t, d):
         return self.critiqueDist(ic, ir, t, d)
 
     # prod is less
     def diminishSat(self, ic, ir, t, d):
-        return 1 - np.exp(-2 * (1 + self.critiqueDist(ic, ir, t, d)))
+        cd = self.critiqueDist(ic, ir, t, d)
+        res = (1 - np.exp(-5 * abs(cd)))
+        return res if cd > 0 else -res / 2.
 
     def critiqueFit(self, ic, ir, t, d):
         return self.linearSat(ic, ir, t, d) # * self.articleCosSimi(ic, ir) # amounts to nothing
