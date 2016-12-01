@@ -357,7 +357,7 @@
      <item>
       <widget class="QPushButton" name="loggerButton">
        <property name="text">
-        <string>Reset Logger</string>
+        <string>Success!</string>
        </property>
       </widget>
      </item>
