@@ -32,16 +32,11 @@ class Suggester:
                                   names=['MovieID', 'Title', 'MoviePopularity'])
         self.tags = pd.read_csv(tagID_tag_tag_popularity, delimiter='\t', header=None,
                                 names=['TagID', 'Tag', 'TagPopularity'])
-        self.prev_tag_ids = []
-        self.prev_tag_values = []
 
         with open(pathJoin(dataRootPath, 'pickled/genome.pickle'), 'rb') as f:
             self.genome = np.array(pickle.load(f))
 
         self.metrics = Metrics(self.tag_relevance, self.movies, self.tags, self.genome)
-
-        self.prev_tag_values = list(itt.repeat(0.5, self.tags.shape[0]))
-        self.curr_movie = self._movieTitleToNum("Fight Club (1999)")
 
         with open(pathJoin(dataRootPath, "json/allFilmsToTags.json")) as f:
             self.precompTags = json.loads(f.read())
@@ -53,12 +48,6 @@ class Suggester:
                self._getMovieByName("Thor: The Dark World (2013)"),
                self._getMovieByName("Frozen (2013)"),
                self._getMovieByName("12 Angry Men (1957)")]
-        ##################################
-        # logger.log([self._movieTitleToID(x) for x in ret],
-        #            self._movieTitleToID(ret[0]),
-        #            [-1] * TAGS_RETURNED,
-        #            [-1] * TAGS_RETURNED)
-        ##################################
         return ret
 
     @staticmethod
@@ -107,17 +96,12 @@ class Suggester:
 
         candidates = sorted(candidates, key=norm)[:MOVIES_RETURNED]
         # print([norm(x) for x in candidates][:MOVIES_RETURNED])
-        self.curr_movie = selectedMovie
         ret = list(self.movies.loc[candidates].Title)
         ##################################
         logger.log([self._movieTitleToID(x) for x in ret],
                    self._movieTitleToID(selectedMovieName),
                    [self._tagNameToID(x) for x in tagNames],
                    tagValues)
-        # logger.log(ret,
-        #            selectedMovieName,
-        #            tagNames,
-        #            tagValues)
         ##################################
         print(ret)
         return ret

@@ -9,7 +9,7 @@ TAGS_RETURNED = 5
 # Logging all the movies returned, chosenMovie (maybe user selected), if user selected
 # reset the logger
 
-# uid | movIDsShown == 6 | depth | chosenID | tagIDs == 5 + 1 | tagVals == 5
+# uid | movIDsShown == 6 | depth | chosenID | tagIDs == 5 + 1 | tagVals == 5 + 1
 
 
 class Logger:
