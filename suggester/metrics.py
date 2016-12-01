@@ -143,9 +143,9 @@ class Metrics:
     def linearSat(self, ic, ir, t, d):
         return self.critiqueDist(ic, ir, t, d)
 
-    # maybe later
+    # prod is less
     def diminishSat(self, ic, ir, t, d):
-        return 1 - np.exp(-5 * self.critiqueDist(ic, ir, t, d))
+        return 1 - np.exp(-2 * (1 + self.critiqueDist(ic, ir, t, d)))
 
     def critiqueFit(self, ic, ir, t, d):
-        return self.linearSat(ic, ir, t, d) * self.articleCosSimi(ic, ir)
+        return self.linearSat(ic, ir, t, d) # * self.articleCosSimi(ic, ir) # amounts to nothing

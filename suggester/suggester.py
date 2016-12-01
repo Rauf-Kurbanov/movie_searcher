@@ -101,7 +101,8 @@ class Suggester:
         candidates = self.metrics.movie_neighbours(selectedMovie)
         # candidates = range(self.movies.shape[0])
         # for tag, d in tagAndDir:
-        #     candidates = [self.metrics.critiqueDist(selectedMovie, c, tag, d) for c in candidates]
+            # print(sorted([self.metrics.critiqueDist(selectedMovie, c, tag, d) for c in candidates])[-5])
+            # print(sorted([self.metrics.articleCosSimi(selectedMovie, c) for c in candidates])[-5])
 
         candidates = sorted(candidates, key=norm)[:MOVIES_RETURNED]
         # print([norm(x) for x in candidates][:MOVIES_RETURNED])
