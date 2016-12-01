@@ -30,7 +30,7 @@ class MovieSuggester(QtGui.QWidget):
             self.suggester.resetLogger(completely=True)
 
         self.loggerButton.clicked.connect(success)
-        
+
         self.goButton.clicked.connect(self.runGo)
         # Connecting buttons of the movies to the function
         for b in getWidgetsWithPrefix(self.goLayout, "nameButton"):
