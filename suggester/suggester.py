@@ -17,7 +17,7 @@ MOVIES_RETURNED = 6
 TAGS_RETURNED = 5
 
 # Sets logging on and off
-logger = Logger("logs/output", True)
+logger = Logger("logs/output", False)
 
 
 class Suggester:
@@ -77,12 +77,9 @@ class Suggester:
 
         directions = [abso(p, c) if p < c else 0 if p == c else -abso(p, c)
                       for (p, c) in zip(prev_tag_values, tagValues)]
-        # directions[5] *= 5
 
         tids = [self._tagNameToID(name) for name in tagNames]
         tagAndDir = [td for td in zip(tids, directions) if td[1] != 0]
-
-        # print("tagAndDir : {}".format(tagAndDir))
 
         def norm(mId):
             return -np.sum([self.metrics.critiqueFit(selectedMovie, mId, tag, d)
