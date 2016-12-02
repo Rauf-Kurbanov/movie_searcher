@@ -136,9 +136,15 @@ class Metrics:
         #         res += c_entr_t * np.log(pop_t)
         # return res
 
+    @staticmethod
+    def gaussian(x, mu, sig, pos):
+        # if pos:
+        return np.exp(-np.power(x - mu, 2.) / (2. * np.power(sig, 2.)))
+
     def critiqueDist(self, critiquedMovieId, retrievedMovieId, tagId, direction):
         ic, ir, t, d = critiquedMovieId, retrievedMovieId, tagId, direction
-        return (self.rel(t, ir) - self.rel(t, ic)) * d / 100.
+        return self.gaussian(int(self.rel(t, ir) * 100), int(self.rel(t, ic) * 100) + d, 7, d > 0)
+        # raise AssertionError
 
     def linearSat(self, ic, ir, t, d):
         return self.critiqueDist(ic, ir, t, d)
@@ -150,4 +156,4 @@ class Metrics:
         return res if cd > 0 else -res / 2.
 
     def critiqueFit(self, ic, ir, t, d):
-        return self.diminishSat(ic, ir, t, d) # * self.articleCosSimi(ic, ir) # amounts to nothing
+        return self.linearSat(ic, ir, t, d) # * self.articleCosSimi(ic, ir) # amounts to nothing
