@@ -57,7 +57,7 @@ class MovieSuggester(QtGui.QWidget):
     def populateMovieDescr(self):
         # Stupid naming in the dataset
         descr, pic = imdb_descr_and_poster_from_title(
-            self.selected_movie.rsplit('(', 1)[0]
+            self.selected_movie.split('(', 1)[0]
                                .rsplit(',', 1)[0])
         self.movieSummary.setText(descr)
 
