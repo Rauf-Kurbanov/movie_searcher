@@ -59,7 +59,7 @@ class MovieSuggester(QtGui.QWidget):
         descr, pic = imdb_descr_and_poster_from_title(
             self.selected_movie.split('(', 1)[0]
                                .rsplit(',', 1)[0])
-        self.movieSummary.setText(descr)
+        self.movieSummary.setText(descr[:1000])
 
         image = QtGui.QImage()
         image.loadFromData(pic)
