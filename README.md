@@ -1,4 +1,6 @@
 # movie_searcher
+0) git clone git@github.com:Rauf-Kurbanov/movie_searcher.git; cd movie_searcher; git checkout release
+
 1) Install anaconda (just the default install should work - I think it has qt in it)
 
 2) Unpack the directory "tag-genome" inside the root folder of your git clone:
