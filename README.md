@@ -1,4 +1,6 @@
 # movie_searcher
+Install anaconda (just the default install should work - I think it has qt in it)
+
 make sure you have the directory "tag-genome"
 
 dataset: https://mega.nz/#!PI1DlZDS!7NWoImXIoH9mStg2Ts010rw4jwCfA2LGQ131Zzk7f08
