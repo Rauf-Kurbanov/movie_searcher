@@ -1,8 +1,8 @@
 # movie_searcher
 1) Install anaconda (just the default install should work - I think it has qt in it)
 
-2) Unpack the directory "tag-genome" inside the root folder of your git clone
-tag-genome: https://mega.nz/#!PI1DlZDS!7NWoImXIoH9mStg2Ts010rw4jwCfA2LGQ131Zzk7f08
+2) Unpack the directory "tag-genome" inside the root folder of your git clone:
+https://mega.nz/#!PI1DlZDS!7NWoImXIoH9mStg2Ts010rw4jwCfA2LGQ131Zzk7f08
 
 3) Launch "movieSuggester.py" using python3* from conda
 
