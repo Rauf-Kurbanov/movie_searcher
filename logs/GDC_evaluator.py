@@ -64,7 +64,7 @@ def log_gcd(log):
     return np.mean(session_gcds)
 
 def main():
-    log_path = "./output/1.txt"
+    log_path = "output/2.txt"
     # log = load_log(log_path)()
     
     print(log_gcd(load_log(log_path)()))

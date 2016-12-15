@@ -17,7 +17,7 @@ MOVIES_RETURNED = 6
 TAGS_RETURNED = 5
 
 # Sets logging on and off
-logger = Logger("logs/output", False)
+logger = Logger("logs/output", True)
 
 
 class Suggester:
